@@ -1,0 +1,362 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "AT&T Micro Services"
+host: "localhost:8080"
+basePath: "/webapi"
+schemes:
+- "http"
+paths:
+  /v0.5/catalogServices/catalog/products:
+    get:
+      summary: "Fetch all the products in the marketplace for the given filters and\
+        \ pagination params."
+      description: ""
+      operationId: "getProductList"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Products"
+        500:
+          description: "System Error!!"
+  /v0.5/catalogServices/catalog/products/{productId}:
+    get:
+      summary: "Fetch product details for the given product id."
+      description: ""
+      operationId: "getProductDetails"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "productId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Product"
+        500:
+          description: "System Error!!"
+        404:
+          description: "Product not found!!"
+  /v0.5/profileServices/login/{ctn}:
+    get:
+      summary: "Validates the CTN which is given by the user"
+      description: ""
+      operationId: "validatCTN"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "ctn"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/DefaultCTN"
+        500:
+          description: "System Error!!"
+        404:
+          description: "Invalid CTN!!"
+  /v0.5/profileServices/user/{ctn}:
+    get:
+      summary: "Retrieves profile details for the given CTN"
+      description: ""
+      operationId: "getUserProfile"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "ctn"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ProfileList"
+        500:
+          description: "System Error!!"
+        404:
+          description: "User not found!!"
+definitions:
+  ProductInfo:
+    type: "object"
+    required:
+    - "active"
+    - "displayName"
+    - "id"
+    - "provider"
+    properties:
+      active:
+        type: "boolean"
+        default: false
+      id:
+        type: "string"
+        pattern: "{A-Za-z0-9}*"
+      displayName:
+        type: "string"
+      shortDescription:
+        type: "string"
+      provider:
+        $ref: "#/definitions/Provider"
+      media:
+        $ref: "#/definitions/Media"
+  SkuPriceInfo:
+    type: "object"
+    required:
+    - "id"
+    - "monthlyRecurringFee"
+    - "oneTimeFee"
+    properties:
+      id:
+        type: "string"
+      oneTimeFee:
+        $ref: "#/definitions/Price"
+      monthlyRecurringFee:
+        $ref: "#/definitions/Price"
+      totalPrice:
+        $ref: "#/definitions/Price"
+    xml:
+      name: "contractPriceOffer"
+  Products:
+    type: "object"
+    properties:
+      products:
+        type: "array"
+        items:
+          $ref: "#/definitions/ProductInfo"
+    xml:
+      name: "Products"
+  Organization:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      phoneNumber:
+        type: "string"
+      faxNumber:
+        type: "string"
+      emailAddress:
+        type: "string"
+      address:
+        $ref: "#/definitions/Address"
+  Configuration:
+    type: "object"
+    properties:
+      config1:
+        type: "string"
+      config2:
+        type: "string"
+  Address:
+    type: "object"
+    properties:
+      addressLine1:
+        type: "string"
+      addressLine2:
+        type: "string"
+      addressLine3:
+        type: "string"
+      city:
+        type: "string"
+      state:
+        type: "string"
+      zipCode:
+        type: "string"
+  Media:
+    type: "object"
+    required:
+    - "largeImageUrl"
+    - "smallImageUrl"
+    - "thumbnailurl"
+    properties:
+      thumbnailurl:
+        type: "string"
+      smallImageUrl:
+        type: "string"
+      largeImageUrl:
+        type: "string"
+      auxilaryMedia:
+        type: "string"
+  ProductFeature:
+    type: "object"
+    properties:
+      featureGroup:
+        type: "string"
+      featureDescription:
+        type: "array"
+        items:
+          type: "string"
+  Product:
+    type: "object"
+    required:
+    - "active"
+    - "displayName"
+    - "id"
+    - "provider"
+    properties:
+      active:
+        type: "boolean"
+        default: false
+      id:
+        type: "string"
+        pattern: "{A-Za-z0-9}*"
+      displayName:
+        type: "string"
+      shortDescription:
+        type: "string"
+      longDescription:
+        type: "string"
+      provider:
+        $ref: "#/definitions/Provider"
+      media:
+        $ref: "#/definitions/Media"
+      tncUrl:
+        type: "string"
+      endDate:
+        type: "string"
+        format: "date-time"
+      startDate:
+        type: "string"
+        format: "date-time"
+      configurations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Configuration"
+      features:
+        type: "array"
+        items:
+          $ref: "#/definitions/ProductFeature"
+      skus:
+        type: "array"
+        items:
+          $ref: "#/definitions/Sku"
+      productContent:
+        type: "object"
+        additionalProperties:
+          type: "array"
+          items:
+            type: "string"
+    xml:
+      name: "Product"
+  PriceContract:
+    type: "object"
+    required:
+    - "description"
+    properties:
+      description:
+        type: "string"
+      term:
+        type: "integer"
+        format: "int32"
+      termType:
+        type: "string"
+  Profile:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      gender:
+        type: "string"
+      emailAddress:
+        type: "string"
+      userType:
+        type: "string"
+      organization:
+        $ref: "#/definitions/Organization"
+      contactAddress:
+        $ref: "#/definitions/Address"
+      phoneNumber:
+        type: "string"
+      faxNumber:
+        type: "string"
+      billingAccountNumber:
+        type: "string"
+      ctnNumber:
+        type: "string"
+      foundationAccountNumber:
+        type: "string"
+    xml:
+      name: "profile"
+  Provider:
+    type: "object"
+    required:
+    - "description"
+    - "id"
+    - "name"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      media:
+        $ref: "#/definitions/Media"
+  Price:
+    type: "object"
+    required:
+    - "amount"
+    - "currencyCode"
+    properties:
+      amount:
+        type: "number"
+        format: "double"
+        default: 0.0
+      currencyCode:
+        type: "string"
+        default: "USD"
+  DefaultCTN:
+    type: "object"
+    required:
+    - "encryptedCTN"
+    properties:
+      encryptedCTN:
+        type: "string"
+        default: "1234"
+  ProfileList:
+    type: "object"
+    properties:
+      profile:
+        type: "array"
+        items:
+          $ref: "#/definitions/Profile"
+  Sku:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      socCode:
+        type: "string"
+      displayName:
+        type: "string"
+      description:
+        type: "string"
+      priceInfo:
+        $ref: "#/definitions/SkuPriceInfo"
+      contract:
+        $ref: "#/definitions/PriceContract"
+    xml:
+      name: "sku"
